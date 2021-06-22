@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>transactionReport管理</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- 上传图片框样式，不使用上传组件可以删除此样式 -->
+    <style>
+        .avatar-uploader .el-upload {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 150px;
+            height: 70px;
+            line-height: 150px;
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 70px;
+            display: block;
+        }
+
+    </style>
+</head>
+<body class="hold-transition">
+<div id="app">
+
+    <div class="content-header">
+        <h1>管理<small>交易统计管理</small></h1>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>管理</el-breadcrumb-item>
+            <el-breadcrumb-item>交易统计管理</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+
+    <div class="app-container">
+        <div class="box">
+            <el-date-picker
+                    v-model="dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    @change="fetchData()">
+            </el-date-picker>
+            <div id="main" style="width: 700px;height:400px;"></div>
+            <el-table :data="tableData" border style="width: 100%">
+                          <el-table-column prop="userCount" label="下单人数" width="80"></el-table-column>
+          <el-table-column prop="orderCount" label="订单数" width="80"></el-table-column>
+          <el-table-column prop="orderGoodsCount" label="下单件数" width="80"></el-table-column>
+          <el-table-column prop="orderValidCount" label="有效订单数" width="80"></el-table-column>
+          <el-table-column prop="orderMoney" label="下单金额" width="80"></el-table-column>
+          <el-table-column prop="returnMoney" label="退款金额" width="80"></el-table-column>
+          <el-table-column prop="userPayedCount" label="付款人数" width="80"></el-table-column>
+          <el-table-column prop="orderPayedCount" label="付款订单数" width="80"></el-table-column>
+          <el-table-column prop="goodsPayedCount" label="付款件数" width="80"></el-table-column>
+          <el-table-column prop="moneyPayedCount" label="付款金额" width="80"></el-table-column>
+
+            </el-table>
+
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+</body>
+<script src="/js/util.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.js"></script>
+<script src="/js/elementui.js"></script>
+<script src="/js/echarts.common.min.js"></script>
+<script>
+     new Vue({
+        el: '#app',
+        data(){
+            return {
+                tableData: [],
+                dateRange:[],
+                transactionData:[],
+                data:['下单人数','订单数','下单件数','有效订单数','下单金额','退款金额','付款人数','付款订单数','付款件数','付款金额']
+            }
+        },
+        created(){
+        },
+        methods:{
+            fetchData (){
+                let date1 = this.dateRange[0].Format("yyyy-MM-dd");
+                let date2 = this.dateRange[1].Format("yyyy-MM-dd");
+                axios.post(`/transactionReport/findByDateRange.do?date1=${date1}&date2=${date2}`).then(response => {
+                    this.tableData = response.data;
+                    //创建饼图
+                    transactionData=[]
+                    let map=this.tableData[0]
+                    let i=0
+                    for(var key in map){
+                        transactionData.push({name:this.data[i],value:map[key]})
+                        i+=1
+                    }
+                    // 基于准备好的dom，初始化echarts实例
+                    let myChart = echarts.init(document.getElementById('main'));
+
+                    // 指定图表的配置项和数据
+                    let option = {
+                        title: {
+                            text: '交易分析',
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter:"{a} <br/>{b}:{c}({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data:this.data
+                        },
+                        series: [
+
+                            {
+                                name: '交易统计',
+                                type: 'pie',
+                                radius: '50%',
+                                center:['65%','50%'],
+                                data: transactionData,
+                                emphasis: {
+                                    itemStyle: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                });
+
+            }
+        }
+    })
+</script>
+</html>
