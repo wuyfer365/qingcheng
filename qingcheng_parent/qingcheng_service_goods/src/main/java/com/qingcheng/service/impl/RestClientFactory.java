@@ -6,8 +6,8 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 
 public class RestClientFactory {
-    public static RestHighLevelClient getRestHighLevelClient() {
-        HttpHost http = new HttpHost("127.0.0.1", 9200, "http");
+    public static RestHighLevelClient getRestHighLevelClient(String hostname,int port) {
+        HttpHost http = new HttpHost(hostname, port, "http");
         RestClientBuilder builder = RestClient.builder(http);
         return new RestHighLevelClient(builder);
     }
