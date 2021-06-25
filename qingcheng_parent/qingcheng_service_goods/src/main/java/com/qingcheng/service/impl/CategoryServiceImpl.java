@@ -6,7 +6,9 @@ import com.qingcheng.dao.CategoryMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.goods.Category;
 import com.qingcheng.service.goods.CategoryService;
+import com.qingcheng.util.CacheKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -79,6 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     public void add(Category category) {
         categoryMapper.insertSelective(category);
+        saveCategoryTreeToRedis();
     }
 
     /**
@@ -87,6 +90,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     public void update(Category category) {
         categoryMapper.updateByPrimaryKeySelective(category);
+        saveCategoryTreeToRedis();
     }
 
     /**
@@ -102,15 +106,26 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("存在下级分类不能删除！");
         }
         categoryMapper.deleteByPrimaryKey(id);
+        saveCategoryTreeToRedis();
     }
 
     public List<Map> findCategoryTree() {
+        //从缓存提取分类
+        System.out.println("从缓存提取分类");
+        return (List<Map>) redisTemplate.boundValueOps(CacheKey.CATEGORY_TREE).get();
+    }
+    @Autowired
+    private RedisTemplate redisTemplate;
+    public void saveCategoryTreeToRedis() {
+        //查询商品分类导航
         Example example = new Example(Category.class);
         Example.Criteria criteria = example.createCriteria();
         criteria.andEqualTo("isShow", "1");
         example.setOrderByClause("seq");
         List<Category> categories = categoryMapper.selectByExample(example);
-        return findByParentId(categories,0);
+        List<Map> categoryTree = findByParentId(categories, 0);
+        //存入redis
+        redisTemplate.boundValueOps(CacheKey.CATEGORY_TREE).set(categoryTree);
     }
 
     private List<Map> findByParentId(List<Category> categories, Integer parentId) {

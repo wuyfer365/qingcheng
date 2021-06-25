@@ -9,16 +9,14 @@ import com.qingcheng.dao.SkuMapper;
 import com.qingcheng.dao.SpuMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.goods.*;
+import com.qingcheng.service.goods.SkuService;
 import com.qingcheng.service.goods.SpuService;
 import com.qingcheng.util.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service(interfaceClass = SpuService.class)
 public class SpuServiceImpl implements SpuService {
@@ -97,6 +95,8 @@ public class SpuServiceImpl implements SpuService {
         spuMapper.updateByPrimaryKeySelective(spu);
     }
 
+    @Autowired
+    private SkuService skuService;
     /**
      *  逻辑删除
      * @param id
@@ -104,6 +104,12 @@ public class SpuServiceImpl implements SpuService {
     public void delete(String id) {
         Spu spu = spuMapper.selectByPrimaryKey(id);
         spu.setIsDelete("1");
+        Map map = new HashMap();
+        map.put("spuId", id);
+        List<Sku> list = skuService.findList(map);
+        for (Sku sku : list) {
+            skuService.deletePriceFromRedisById(sku.getId());
+        }
         spuMapper.updateByPrimaryKey(spu);
     }
 
@@ -113,6 +119,7 @@ public class SpuServiceImpl implements SpuService {
     private CategoryMapper categoryMapper;
     @Autowired
     private CategoryBrandMapper categoryBrandMapper;
+
     @Transactional
     public void saveGoods(Goods goods) {
         Spu spu = goods.getSpu();
@@ -157,6 +164,7 @@ public class SpuServiceImpl implements SpuService {
             sku.setCommentNum(0);
             sku.setSaleNum(0);
             skuMapper.insertSelective(sku);
+            skuService.savePriceToRedisById(sku.getId(),sku.getPrice());
         }
 
         CategoryBrand categoryBrand = new CategoryBrand();
