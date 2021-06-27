@@ -1,6 +1,7 @@
 package com.qingcheng.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.qingcheng.dao.BrandMapper;
 import com.qingcheng.service.goods.SkuSearchService;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -27,6 +28,8 @@ import java.util.Map;
 public class SkuSearchServiceImpl implements SkuSearchService {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+    @Autowired
+    private BrandMapper brandMapper;
 
     public Map search(Map<String,String> searchMap) {
 //        封装查询请求
@@ -42,7 +45,11 @@ public class SkuSearchServiceImpl implements SkuSearchService {
             TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("categoryName", searchMap.get("category"));
             boolQueryBuilder.filter(termQueryBuilder);
         }
-
+//        1.3品牌过滤
+        if (searchMap.get("brand") != null) {
+            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("brandName", searchMap.get("brand"));
+            boolQueryBuilder.filter(termQueryBuilder);
+        }
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
 
@@ -76,6 +83,21 @@ public class SkuSearchServiceImpl implements SkuSearchService {
                 categoryList.add(bucket.getKeyAsString());
             }
             resultMap.put("categoryList", categoryList);
+
+            //2.3品牌列表
+            if (searchMap.get("brand") == null) {
+                String categoryName="";
+                if (searchMap.get("category") == null) {
+                    if (categoryList.size() > 0) {
+                        categoryName = categoryList.get(0);
+                    }
+                }else {
+                    categoryName = searchMap.get("category");
+                }
+                List<Map> brandList = brandMapper.findListByCategoryName(categoryName);
+                resultMap.put("brandList", brandList);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

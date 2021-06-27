@@ -36,7 +36,7 @@
 							<li class="f-item"><span>关注青橙</span></li>
 							<li class="f-item"><span><a href="cooperation.html" target="_blank">合作招商</a></span></li>
 							<li class="f-item"><span><a href="shoplogin.html" target="_blank">商家后台</a></span></li>				
-							<li class="f-item"><span>网站导航</li>
+                            <li class="f-item"><span>网站导航</span></li>
 						</ul>
 					</div>
 					
@@ -473,7 +473,14 @@
 					<li class="with-x" th:if="${#maps.containsKey(searchMap,'category')}">
                         <span th:text="${'商品分类：'+searchMap.category}"></span>
                         <i><a th:href="${#strings.replace(url,'&category='+searchMap.category,'')}">×</a>
-                            </i></li>
+                            </i>
+                    </li>
+                    <!--品牌条件-->
+                    <li class="with-x" th:if="${#maps.containsKey(searchMap,'brand')}">
+                        <span th:text="${'品牌：'+searchMap.brand}"></span>
+                        <i><a th:href="${#strings.replace(url,'&brand='+searchMap.brand,'')}">×</a>
+                        </i>
+                    </li>
 					<li class="with-x">华为<i>×</i></li>
 					<li class="with-x">OPPO<i>×</i></li>
 				</ul>				
@@ -489,28 +496,16 @@
 					</div>
 					<div class="fl ext"></div>
 				</div>
-				<div class="type-wrap logo">
+				<div class="type-wrap logo" th:if="${!#maps.containsKey(searchMap,'brand')}">
 					<div class="fl key brand">品牌</div>
 					<div class="value logos">
 						<ul class="logo-list">
-							<li>索尼（SONY）</li>
-							<li>TCL</li>
-							<li>长虹（CHANGHONG）</li>
-							<li>飞利浦（PHILIPS）</li>
-							<li>风行电视</li>
-							<li><img src="./img/_/phone06.png" /></li>
-							<li><img src="./img/_/phone07.png" /></li>
-							<li><img src="./img/_/phone08.png" /></li>
-							<li><img src="./img/_/phone09.png" /></li>
-							<li><img src="./img/_/phone10.png" /></li>
-							<li><img src="./img/_/phone11.png" /></li>
-							<li><img src="./img/_/phone12.png" /></li>
-							<li><img src="./img/_/phone12.png" /></li>
-							<li><img src="./img/_/phone14.png" /></li>
-							<li><img src="./img/_/phone01.png" /></li>
-							<li><img src="./img/_/phone06.png" /></li>
-							<li><img src="./img/_/phone07.png" /></li>
-							<li><img src="./img/_/phone02.png" /></li>
+							<li th:each="brand:${result.brandList}">
+                                <a th:href="${url+'&brand='+brand.name}">
+                                    <img th:if="${brand.image}!=''" th:src="${brand.image}" />
+                                    <span th:if="${brand.image}==''" th:text="${brand.name}"></span>
+                                </a>
+                            </li>
 						</ul>
 					</div>
 					<div class="ext">
