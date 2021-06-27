@@ -9,6 +9,7 @@
         <module name="qingcheng_common" />
         <module name="qingcheng_common_service" />
         <module name="qingcheng_common_web" />
+        <module name="qingcheng_elasticsearch" />
         <module name="qingcheng_interface" />
         <module name="qingcheng_pojo" />
         <module name="qingcheng_service_business" />
@@ -23,6 +24,7 @@
       <module name="qingcheng_common" target="1.5" />
       <module name="qingcheng_common_service" target="1.5" />
       <module name="qingcheng_common_web" target="1.8" />
+      <module name="qingcheng_elasticsearch" target="1.8" />
       <module name="qingcheng_interface" target="1.5" />
       <module name="qingcheng_parent" target="1.5" />
       <module name="qingcheng_pojo" target="1.5" />

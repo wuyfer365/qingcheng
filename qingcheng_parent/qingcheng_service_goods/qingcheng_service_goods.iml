@@ -136,7 +136,6 @@
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.10.1" level="project" />
     <orderEntry type="library" name="Maven: com.tdunning:t-digest:3.2" level="project" />
     <orderEntry type="library" name="Maven: org.hdrhistogram:HdrHistogram:2.1.9" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.11.1" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch:jna:4.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.client:elasticsearch-rest-client:6.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
@@ -148,6 +147,7 @@
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:rank-eval-client:6.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.elasticsearch.plugin:lang-mustache-client:6.5.3" level="project" />
     <orderEntry type="library" name="Maven: com.github.spullara.mustache.java:compiler:0.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.6.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
   </component>
 </module>

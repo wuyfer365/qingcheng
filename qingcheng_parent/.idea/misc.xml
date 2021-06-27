@@ -6,6 +6,7 @@
     </list>
   </component>
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/qingcheng_elasticsearch" />
     <file type="web" url="file://$PROJECT_DIR$/qingcheng_service_business" />
     <file type="web" url="file://$PROJECT_DIR$/qingcheng_service_config" />
     <file type="web" url="file://$PROJECT_DIR$/qingcheng_service_goods" />

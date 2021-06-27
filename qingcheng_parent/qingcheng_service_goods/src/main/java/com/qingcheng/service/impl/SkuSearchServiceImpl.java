@@ -9,6 +9,11 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +39,10 @@ public class SkuSearchServiceImpl implements SkuSearchService {
         boolQueryBuilder.must(matchQueryBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
+
+        //聚合查询（商品分类）
+        TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders.terms("sku_category").field("categoryName");
+        searchSourceBuilder.aggregation(termsAggregationBuilder);
 //        封装查询结果
         SearchResponse searchResponse = null;
         Map resultMap = new HashMap();
@@ -49,6 +58,18 @@ public class SkuSearchServiceImpl implements SkuSearchService {
                 resultList.add(skuMap);
             }
             resultMap.put("rows", resultList);
+            //2.2商品分类列表
+            Aggregations aggregations = searchResponse.getAggregations();
+            Map<String, Aggregation> aggregationMap = aggregations.getAsMap();
+
+            Terms terms = (Terms) aggregationMap.get("sku_category");
+
+            List<? extends Terms.Bucket> buckets =  terms.getBuckets();
+            List<String> categoryList = new ArrayList<String>();
+            for( Terms.Bucket bucket:buckets ){
+                categoryList.add(bucket.getKeyAsString());
+            }
+            resultMap.put("categoryList", categoryList);
         } catch (IOException e) {
             e.printStackTrace();
         }

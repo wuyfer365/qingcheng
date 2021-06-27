@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/qingcheng_common/qingcheng_common.iml" filepath="$PROJECT_DIR$/qingcheng_common/qingcheng_common.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_common_service/qingcheng_common_service.iml" filepath="$PROJECT_DIR$/qingcheng_common_service/qingcheng_common_service.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_common_web/qingcheng_common_web.iml" filepath="$PROJECT_DIR$/qingcheng_common_web/qingcheng_common_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qingcheng_elasticsearch/qingcheng_elasticsearch.iml" filepath="$PROJECT_DIR$/qingcheng_elasticsearch/qingcheng_elasticsearch.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_interface/qingcheng_interface.iml" filepath="$PROJECT_DIR$/qingcheng_interface/qingcheng_interface.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_parent.iml" filepath="$PROJECT_DIR$/qingcheng_parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_pojo/qingcheng_pojo.iml" filepath="$PROJECT_DIR$/qingcheng_pojo/qingcheng_pojo.iml" />

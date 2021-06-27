@@ -19,6 +19,7 @@
         <module>qingcheng_common_service</module>
         <module>qingcheng_common_web</module>
         <module>qingcheng_web_portal</module>
+        <module>qingcheng_elasticsearch</module>
     </modules>
 
     <packaging>pom</packaging>
