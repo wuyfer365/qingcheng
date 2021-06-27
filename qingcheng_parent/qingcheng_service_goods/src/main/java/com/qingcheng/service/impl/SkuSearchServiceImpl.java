@@ -37,6 +37,12 @@ public class SkuSearchServiceImpl implements SkuSearchService {
 //        1.1关键字搜索
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name",searchMap.get("keywords"));
         boolQueryBuilder.must(matchQueryBuilder);
+//        1.2商品分类过滤
+        if (searchMap.get("category") != null) {
+            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("categoryName", searchMap.get("category"));
+            boolQueryBuilder.filter(termQueryBuilder);
+        }
+
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
 
