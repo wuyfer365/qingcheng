@@ -32,7 +32,7 @@ public class ImportData {
         RestHighLevelClient restHighLevelClient=new RestHighLevelClient(builder);//高级客户端对象 （连接）
 
         //2.封装查询请求
-        PageResult<Sku> page = skuService.findPage(1, 1000);
+        PageResult<Sku> page = skuService.findPage(8, 10000);
 
         BulkRequest bulkRequest=new BulkRequest();
         IndexRequest indexRequest=null;

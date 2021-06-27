@@ -1,7 +1,8 @@
 package com.qingcheng.service.impl;
-
+import org.elasticsearch.index.query.QueryBuilders;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.qingcheng.dao.BrandMapper;
+import com.qingcheng.dao.SpecMapper;
 import com.qingcheng.service.goods.SkuSearchService;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -30,6 +31,8 @@ public class SkuSearchServiceImpl implements SkuSearchService {
     private RestHighLevelClient restHighLevelClient;
     @Autowired
     private BrandMapper brandMapper;
+    @Autowired
+    private SpecMapper specMapper;
 
     public Map search(Map<String,String> searchMap) {
 //        封装查询请求
@@ -49,6 +52,13 @@ public class SkuSearchServiceImpl implements SkuSearchService {
         if (searchMap.get("brand") != null) {
             TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("brandName", searchMap.get("brand"));
             boolQueryBuilder.filter(termQueryBuilder);
+        }
+        //1.4规格过滤
+        for (String key : searchMap.keySet()) {
+            if (key.startsWith("spec.")) {
+                TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(key+".keyword", searchMap.get(key));
+                boolQueryBuilder.filter(termQueryBuilder);
+            }
         }
         searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
@@ -84,20 +94,29 @@ public class SkuSearchServiceImpl implements SkuSearchService {
             }
             resultMap.put("categoryList", categoryList);
 
+
+            String categoryName="";
+            if (searchMap.get("category") == null) {
+                if (categoryList.size() > 0) {
+                    categoryName = categoryList.get(0);
+                }
+            }else {
+                categoryName = searchMap.get("category");
+            }
             //2.3品牌列表
             if (searchMap.get("brand") == null) {
-                String categoryName="";
-                if (searchMap.get("category") == null) {
-                    if (categoryList.size() > 0) {
-                        categoryName = categoryList.get(0);
-                    }
-                }else {
-                    categoryName = searchMap.get("category");
-                }
+
                 List<Map> brandList = brandMapper.findListByCategoryName(categoryName);
                 resultMap.put("brandList", brandList);
             }
 
+            //2.4规格列表
+            List<Map> specList = specMapper.findListByCategoryName(categoryName);
+            for (Map map : specList) {
+                String[] options = ((String) map.get("options")).split(",");
+                map.put("options", options);
+            }
+            resultMap.put("specList", specList);
         } catch (IOException e) {
             e.printStackTrace();
         }
