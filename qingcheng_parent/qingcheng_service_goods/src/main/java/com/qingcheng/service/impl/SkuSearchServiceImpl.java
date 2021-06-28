@@ -1,5 +1,6 @@
 package com.qingcheng.service.impl;
 import com.qingcheng.util.CacheKey;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.qingcheng.dao.BrandMapper;
@@ -18,6 +19,9 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -82,6 +86,19 @@ public class SkuSearchServiceImpl implements SkuSearchService {
         int fromIndex=(pageNo-1)*pageSize;
         searchSourceBuilder.from(fromIndex);
         searchSourceBuilder.size(pageSize);
+
+        //排序
+        String sort = searchMap.get("sort");
+        String sortOrder = searchMap.get("sortOrder");
+        if (!"".equals(sort)) {
+            searchSourceBuilder.sort(sort, SortOrder.valueOf(sortOrder));
+        }
+
+        //高亮设置
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("name").preTags("<font style='color:red'>").postTags("</font>");
+        searchSourceBuilder.highlighter(highlightBuilder);
+
         searchRequest.source(searchSourceBuilder);
 
         //聚合查询（商品分类）
@@ -99,6 +116,11 @@ public class SkuSearchServiceImpl implements SkuSearchService {
             List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
             for (SearchHit hit : hits1) {
                 Map<String, Object> skuMap = hit.getSourceAsMap();
+
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                HighlightField name = highlightFields.get("name");
+                Text[] fragments = name.fragments();
+                skuMap.put("name", fragments[0].toString());
                 resultList.add(skuMap);
             }
             resultMap.put("rows", resultList);

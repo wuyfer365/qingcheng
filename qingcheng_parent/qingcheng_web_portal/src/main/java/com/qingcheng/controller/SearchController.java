@@ -23,6 +23,13 @@ public class SearchController {
             searchMap.put("pageNo", "1");
         }
 
+        if (searchMap.get("sort") == null) {
+            searchMap.put("sort", "");
+        }
+        if (searchMap.get("sortOrder") == null) {
+            searchMap.put("sortOrder", "DESC");
+        }
+
         Map result = skuSearchService.search(searchMap);
         model.addAttribute("result", result);
         //url处理
@@ -32,8 +39,29 @@ public class SearchController {
         }
         model.addAttribute("url", url);
         model.addAttribute("searchMap", searchMap);
+        //页码
         int pageNo = Integer.parseInt(searchMap.get("pageNo"));
         model.addAttribute("pageNo", pageNo);
+
+        Long totalPages = (Long) result.get("totalPages");
+        int startPage=1;
+        int endPage=totalPages.intValue();
+
+        if (totalPages > 5) {
+            startPage=pageNo-2;
+            if (startPage < 1) {
+                startPage=1;
+            }
+            endPage=startPage+4;
+            if (endPage > totalPages) {
+                endPage=totalPages.intValue();
+            }
+        }
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+
         return "search";
     }
 }
