@@ -19,6 +19,10 @@ public class SearchController {
     public String search(Model model, @RequestParam Map<String, String> searchMap) throws Exception {
 //        字符集处理(解决中文乱码)
         searchMap = WebUtil.convertCharsetToUTF8(searchMap);
+        if (searchMap.get("pageNo") == null) {
+            searchMap.put("pageNo", "1");
+        }
+
         Map result = skuSearchService.search(searchMap);
         model.addAttribute("result", result);
         //url处理
@@ -28,6 +32,8 @@ public class SearchController {
         }
         model.addAttribute("url", url);
         model.addAttribute("searchMap", searchMap);
+        int pageNo = Integer.parseInt(searchMap.get("pageNo"));
+        model.addAttribute("pageNo", pageNo);
         return "search";
     }
 }

@@ -643,27 +643,16 @@
 							<li class="prev disabled">
 								<a href="#">«上一页</a>
 							</li>
-							<li class="active">
-								<a href="#">1</a>
+							<li th:class="${page==pageNo?'active':''}" th:each="page:${#numbers.sequence(1,result.totalPages)}">
+								<a th:href="${#strings.replace(url,'&pageNo='+searchMap.pageNo,'&pageNo='+page)}" th:text="${page}" ></a>
 							</li>
-							<li>
-								<a href="#">2</a>
-							</li>
-							<li>
-								<a href="#">3</a>
-							</li>
-							<li>
-								<a href="#">4</a>
-							</li>
-							<li>
-								<a href="#">5</a>
-							</li>
+
 							<li class="dotted"><span>...</span></li>
 							<li class="next">
 								<a href="#">下一页»</a>
 							</li>
 						</ul>
-						<div><span>共10页&nbsp;</span><span>
+						<div><span th:text="${'共'+result.totalPages+'页&nbsp;'}"></span><span>
       到第
       <input type="text" class="page-num">
       页 <button class="page-confirm" onclick="alert(1)">确定</button></span></div>

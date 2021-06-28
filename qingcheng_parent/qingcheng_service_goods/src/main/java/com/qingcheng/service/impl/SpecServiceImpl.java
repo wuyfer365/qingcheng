@@ -109,6 +109,10 @@ public class SpecServiceImpl implements SpecService {
         specMapper.deleteByPrimaryKey(id);
     }
 
+    public void saveSpecListToRedis() {
+
+    }
+
     /**
      * 构建查询条件
      * @param searchMap

@@ -9,7 +9,7 @@ import java.util.*;
  */
 public interface CategoryService {
 
-
+    public void saveBrandListToRedis();
     public List<Category> findAll();
 
 
@@ -36,4 +36,7 @@ public interface CategoryService {
 
     public void saveCategoryTreeToRedis();
 
+    public void saveSpecListToRedis();
+
+    void saveBrandAndSpecListToRedisNow();
 }

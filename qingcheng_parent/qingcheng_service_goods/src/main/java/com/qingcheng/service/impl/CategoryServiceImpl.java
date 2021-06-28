@@ -2,7 +2,9 @@ package com.qingcheng.service.impl;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.qingcheng.dao.BrandMapper;
 import com.qingcheng.dao.CategoryMapper;
+import com.qingcheng.dao.SpecMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.goods.Category;
 import com.qingcheng.service.goods.CategoryService;
@@ -187,5 +189,51 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return example;
     }
+    @Autowired
+    private BrandMapper brandMapper;
+    public void saveBrandListToRedis() {
+        //查询商品分类
+        Example example = new Example(Category.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("isShow", "1");
+        example.setOrderByClause("seq");
+        List<Category> categories = categoryMapper.selectByExample(example);
 
+        for (Category category : categories) {
+            String categoryName = category.getName();
+            List<Map> brandList = brandMapper.findListByCategoryName(categoryName);
+            Object o = redisTemplate.boundHashOps(CacheKey.BRAND).get(categoryName);
+            //存入redis
+            redisTemplate.boundHashOps(CacheKey.BRAND).put(categoryName,brandList);
+        }
+    }
+
+    @Autowired
+    private SpecMapper SpecMapper;
+    public void saveSpecListToRedis() {
+        //查询商品分类
+        Example example = new Example(Category.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("isShow", "1");
+        example.setOrderByClause("seq");
+        List<Category> categories = categoryMapper.selectByExample(example);
+        for (Category category : categories) {
+            String categoryName = category.getName();
+            List<Map> specList = SpecMapper.findListByCategoryName(categoryName);
+            //存入redis
+            redisTemplate.boundHashOps(CacheKey.SPEC).put(categoryName,specList);
+        }
+    }
+    public void saveBrandAndSpecListToRedisNow() {
+        Boolean hasBrand = redisTemplate.hasKey(CacheKey.BRAND);
+        if (!hasBrand) {
+            //redis中不存在则马上预热
+            saveBrandListToRedis();
+        }
+        Boolean hasSpec = redisTemplate.hasKey(CacheKey.SPEC);
+        if (!hasSpec) {
+            //redis中不存在则马上预热
+            saveSpecListToRedis();
+        }
+    }
 }

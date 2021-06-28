@@ -1,4 +1,5 @@
 package com.qingcheng.service.impl;
+import com.qingcheng.util.CacheKey;
 import org.elasticsearch.index.query.QueryBuilders;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.qingcheng.dao.BrandMapper;
@@ -18,6 +19,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +35,8 @@ public class SkuSearchServiceImpl implements SkuSearchService {
     private BrandMapper brandMapper;
     @Autowired
     private SpecMapper specMapper;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
     public Map search(Map<String,String> searchMap) {
 //        封装查询请求
         SearchRequest searchRequest = new SearchRequest("sku");
@@ -73,6 +76,12 @@ public class SkuSearchServiceImpl implements SkuSearchService {
             }
         }
         searchSourceBuilder.query(boolQueryBuilder);
+        //分页
+        int pageNo = Integer.parseInt(searchMap.get("pageNo"));
+        int pageSize=30;
+        int fromIndex=(pageNo-1)*pageSize;
+        searchSourceBuilder.from(fromIndex);
+        searchSourceBuilder.size(pageSize);
         searchRequest.source(searchSourceBuilder);
 
         //聚合查询（商品分类）
@@ -117,18 +126,33 @@ public class SkuSearchServiceImpl implements SkuSearchService {
             }
             //2.3品牌列表
             if (searchMap.get("brand") == null) {
+                List<Map> brandList = new ArrayList<Map>();
+                if (redisTemplate.boundHashOps(CacheKey.BRAND).get(categoryName) == null) {
+                    brandList = brandMapper.findListByCategoryName(categoryName);
+                } else {
+                    brandList = (List<Map>)redisTemplate.boundHashOps(CacheKey.BRAND).get(categoryName);
+                }
 
-                List<Map> brandList = brandMapper.findListByCategoryName(categoryName);
                 resultMap.put("brandList", brandList);
             }
 
             //2.4规格列表
-            List<Map> specList = specMapper.findListByCategoryName(categoryName);
+            List<Map> specList = new ArrayList<Map>();
+            if (redisTemplate.boundHashOps(CacheKey.SPEC).get(categoryName) == null) {
+                specList = specMapper.findListByCategoryName(categoryName);
+            }else {
+                specList = (List<Map>)redisTemplate.boundHashOps(CacheKey.SPEC).get(categoryName);
+            }
             for (Map map : specList) {
                 String[] options = ((String) map.get("options")).split(",");
                 map.put("options", options);
             }
             resultMap.put("specList", specList);
+
+            //2.5页码
+            long totalCount = hits.getTotalHits();
+            long pageCount = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
+            resultMap.put("totalPages", pageCount);
         } catch (IOException e) {
             e.printStackTrace();
         }
