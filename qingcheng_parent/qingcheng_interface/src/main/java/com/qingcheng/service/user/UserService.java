@@ -26,10 +26,17 @@ public interface UserService {
 
     public void add(User user);
 
-
+    /**
+     * 用户注册
+     * @param user
+     * @param code
+     */
+    public void add(User user,String code);
     public void update(User user);
 
 
     public void delete(String username);
+
+    public void sendSms(String phone);
 
 }

@@ -1,23 +1,29 @@
 package com.qingcheng.service.impl;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.qingcheng.dao.UserMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.user.User;
 import com.qingcheng.service.user.UserService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     /**
      * 返回全部记录
      * @return
@@ -80,6 +86,38 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * 用户注册
+     * @param user
+     * @param code
+     */
+    public void add(User user, String code) {
+        //1.校验
+        String sysCode = (String) redisTemplate.boundValueOps("code_" + user.getPhone()).get();
+        if (sysCode == null) {
+            throw new RuntimeException("验证码未发送或已过期");
+        }
+        if (!sysCode.equals(code)) {
+            throw new RuntimeException("验证码不正确");
+        }
+        if (user.getUsername() == null) {
+            user.setUsername(user.getPhone());//把手机号作为用户名
+        }
+        User searchUser = new User();
+        searchUser.setUsername(user.getUsername());
+        if (userMapper.selectCount(searchUser) > 0) {
+            throw new RuntimeException("此用户名已经注册");
+        }
+        //2.数据添加
+        user.setCreated(new Date());
+        user.setUpdated(new Date());
+        user.setPoints(0);
+        user.setStatus("1");
+        user.setIsEmailCheck("0");
+        user.setIsMobileCheck("1");
+        userMapper.insert(user);
+    }
+
+    /**
      * 修改
      * @param user
      */
@@ -93,6 +131,26 @@ public class UserServiceImpl implements UserService {
      */
     public void delete(String username) {
         userMapper.deleteByPrimaryKey(username);
+    }
+
+
+
+//发送短信验证码
+    public void sendSms(String phone) {
+//   1.生成随机验证码6位
+        Random random = new Random();
+        int i = random.nextInt(999999);
+        if (i < 100000) {
+            i = i + 100000;
+        }
+//        2.存入redis
+        redisTemplate.boundValueOps("code_"+phone).set(i+"");
+        redisTemplate.boundValueOps("code_" + phone).expire(5, TimeUnit.MINUTES);
+//        3.发送到mq
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("phone", phone);
+        map.put("code",i+"");
+        rabbitTemplate.convertAndSend("","queue.sms", JSON.toJSONString(map));
     }
 
     /**
