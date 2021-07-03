@@ -117,7 +117,7 @@ public class OrderItem implements Serializable{
 		this.num = num;
 	}
 
-	public Integer getMoney() {
+	public  Integer getMoney() {
 		return money;
 	}
 	public void setMoney(Integer money) {

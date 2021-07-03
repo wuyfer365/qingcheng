@@ -9,6 +9,7 @@ import com.qingcheng.service.order.PreferentialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -93,6 +94,32 @@ public class PreferentialServiceImpl implements PreferentialService {
      */
     public void delete(Integer id) {
         preferentialMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public int findPreMoneyByCategoryId(Integer categoryId, int money) {
+        Example example = new Example(Preferential.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("state", "1");
+        criteria.andEqualTo("categoryId", categoryId);
+        criteria.andLessThanOrEqualTo("buyMoney", money);
+        criteria.andGreaterThanOrEqualTo("endTime", new Date());
+        criteria.andLessThanOrEqualTo("startTime", new Date());
+        example.setOrderByClause("buy_money desc");
+        List<Preferential> preferentials = preferentialMapper.selectByExample(example);
+        if (preferentials.size() >= 1) {
+            //有优惠
+            Preferential preferential = preferentials.get(0);
+            if ("1".equals(preferential.getType())) {
+                //不翻倍
+                return preferential.getPreMoney();
+            } else {
+                int multiple = money / preferential.getBuyMoney();
+                return preferential.getPreMoney()*multiple;
+            }
+        } else {
+            return 0;
+        }
     }
 
     /**

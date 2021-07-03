@@ -8,5 +8,7 @@
 
     <http pattern="/index.do" security="none"/>
     <http pattern="/search.do" security="none"/>
+    <http pattern="/item/createPage.do" security="none"/>
+    <http pattern="/img/favicon.ico" security="none"/>
 
 </beans:beans>
