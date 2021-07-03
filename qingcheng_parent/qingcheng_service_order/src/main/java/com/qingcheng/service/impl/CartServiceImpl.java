@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 public class CartServiceImpl implements CartService {
     @Autowired
     private RedisTemplate redisTemplate;
+    @Override
     public List<Map<String, Object>> findCartList(String username) {
         System.out.println("get cart from redis:"+username);
         List<Map<String, Object>> cartList=(List<Map<String, Object>>)redisTemplate.boundHashOps(CacheKey.CART_LIST).get(username);
@@ -153,5 +154,22 @@ public class CartServiceImpl implements CartService {
             allPreMoney+=preMoney;
         }
         return allPreMoney;
+    }
+
+    @Override
+    public List<Map<String, Object>> findNewOrderItemList(String username) {
+        //获取购物车
+        List<Map<String, Object>> cartList = findCartList(username);
+
+        //刷新购物车价格
+        for (Map<String, Object> map : cartList) {
+            OrderItem orderItem = (OrderItem) map.get("item");
+            Sku sku = skuService.findById(orderItem.getSkuId());
+            orderItem.setPrice(sku.getPrice());
+            orderItem.setMoney(sku.getPrice()*orderItem.getNum());
+        }
+        //保存最新购物车
+        redisTemplate.boundHashOps(CacheKey.CART_LIST).put(username,cartList);
+        return cartList;
     }
 }

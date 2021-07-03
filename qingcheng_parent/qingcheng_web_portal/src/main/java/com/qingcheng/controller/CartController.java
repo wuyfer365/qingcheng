@@ -2,9 +2,13 @@ package com.qingcheng.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.qingcheng.entity.Result;
+import com.qingcheng.pojo.user.Address;
 import com.qingcheng.pojo.user.User;
 import com.qingcheng.service.order.CartService;
+import com.qingcheng.service.user.AddressService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,6 +68,31 @@ public class CartController {
         Map map = new HashMap();
         map.put("preferential",preferential);
         return map;
+    }
+
+    /**
+     * 获取最新价格的购物车
+     * @return
+     */
+    @GetMapping("/findNewOrderItemList")
+    public List<Map<String, Object>> findNewOrderItemList() {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Map<String, Object>> newOrderItemList = cartService.findNewOrderItemList(name);
+        return newOrderItemList;
+    }
+
+    @Reference
+    AddressService addressService;
+    @GetMapping("/findAddressList")
+    public List<Address> findAddressList() {
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Address> addressList = addressService.findByUsername(name);
+        return addressList;
     }
 
 }
