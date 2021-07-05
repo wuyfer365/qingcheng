@@ -141,7 +141,6 @@ public class OrderServiceImpl implements OrderService {
                 orderItem.setPayMoney(orderItem.getMoney()*proportion);
                 orderItemMapper.insert(orderItem);
             }
-//            int x=1/0;
         } catch (Exception e) {
             e.printStackTrace();
             rabbitTemplate.convertAndSend("","queue.skuback", JSON.toJSONString(orderItemList));
