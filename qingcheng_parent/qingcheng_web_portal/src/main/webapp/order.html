@@ -87,7 +87,7 @@
 						<ul class="addr-detail">
 							<li class="addr-item">
 								<div class="choose-address" v-for="address in addressList">
-									<div class="con name selected"><a href="javascript:;" >{{address.contact}}<span title="点击取消选择"></span></a></div>
+									<div :class="order.receiverAddress==address.address?'con name selected':'con name'" @click="selectAddress(address)"><a href="javascript:;" >{{address.contact}}<span title="点击取消选择"></span></a></div>
 									<div class="con address">
 										<span class="place">{{address.address}}</span>
 										<span class="phone">{{address.phone}}</span>
@@ -110,8 +110,8 @@
 					</div>
 					<div class="step-cont">
 						<ul class="payType">
-							<li class="selected">在线支付<span title="点击取消选择"></span></li>
-							<li>货到付款<span title="点击取消选择"></span></li>
+							<li class="selected" @click="order.payType='1'">在线支付<span title="点击取消选择"></span></li>
+							<li @click="order.payType='0'">货到付款<span title="点击取消选择"></span></li>
 						</ul>
 					</div>
 					<div class="hr"></div>
@@ -156,7 +156,7 @@
 								</div>
 								<div class="buyMessage">
 									<span>买家留言：</span>
-									<textarea placeholder="建议留言前先与商家沟通确认" class="remarks-cont"></textarea>
+									<textarea placeholder="建议留言前先与商家沟通确认" class="remarks-cont" v-model="order.buyerMessage"></textarea>
 								</div>
 							</li>
 							<li></li>
@@ -203,13 +203,13 @@
 			<div class="fc-price">应付金额:　<span class="price">¥{{(payMoney/100).toFixed(2)}}</span></div>
 			<div class="fc-receiverInfo">
 				寄送至:
-				<span id="receive-address">北京市海淀区三环内中关村软件园9号楼</span> 
-				收货人：<span id="receive-name">冯提莫</span>
-				<span id="receive-phone">15922333201</span>
+				<span id="receive-address">{{order.receiverAddress}}</span>
+				收货人：<span id="receive-name">{{order.receiverContact}}</span>
+				<span id="receive-phone">{{order.receiverMobile}}</span>
 			</div>
 		</div>
 		<div class="submit">
-			<a class="sui-btn btn-danger btn-xlarge" href="pay.html">提交订单</a>
+			<a class="sui-btn btn-danger btn-xlarge" @click="saveOrder()">提交订单</a>
 		</div>
 	</div>
 	<!-- 底部栏位 -->
@@ -360,7 +360,8 @@
                 totalMoney:0,
 				payMoney:0,
                 preferential:0,
-				addressList:[]
+				addressList:[],
+				order:{receiverContact:"",receiverMobile:"",receiverAddress:"",payType:"1"}
             }
         },
         created(){
@@ -396,8 +397,36 @@
             async findAddressList() {
                 await axios.get(`/cart/findAddressList.do`).then(response=>{
                     this.addressList=response.data;
+                    //默认地址
+                    for (var i = 0; i < this.addressList.length; i++) {
+                        var obj = this.addressList[i];
+                        if(obj.isDefault=='1') {
+                            this.order.receiverAddress=obj.address;
+                            this.order.receiverContact=obj.contact;
+                            this.order.receiverMobile=obj.phone;
+                        }
+                    }
+					
                 })
             },
+			selectAddress(address) {
+				this.order.receiverAddress=address.address;
+				this.order.receiverContact=address.contact;
+				this.order.receiverMobile=address.phone;
+            },
+			saveOrder() {
+                axios.post(`/cart/saveOrder.do`, this.order).then(response => {
+                    if(response.data.ordersn != null){
+                        if(this.order.payType=='1'){
+                            location.href=`pay.html?ordersn=${response.data.ordersn}&money=${response.data.money}`
+						}else {
+                            location.href=`order-success.html?ordersn=${response.data.ordersn}&money=${response.data.money}`
+						}
+					}else {
+                        location.href=`order-fail.html`
+					}
+				})
+            }
         }
     })
 </script>

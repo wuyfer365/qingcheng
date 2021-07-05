@@ -2,7 +2,6 @@ package com.qingcheng.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.github.pagehelper.PageInfo;
 import com.qingcheng.pojo.goods.Category;
 import com.qingcheng.pojo.goods.Sku;
 import com.qingcheng.pojo.order.OrderItem;
@@ -16,7 +15,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -36,7 +34,7 @@ public class CartServiceImpl implements CartService {
     private SkuService skuService;
     @Reference
     private CategoryService categoryService;
-
+    @Override
     public void addItem(String username, String skuId, Integer num) {
         List<Map<String, Object>> cartList = findCartList(username);
         boolean flag=false;

@@ -1,18 +1,32 @@
 package com.qingcheng.service.impl;
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.qingcheng.dao.OrderItemMapper;
 import com.qingcheng.dao.OrderMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.order.Order;
+import com.qingcheng.pojo.order.OrderItem;
+import com.qingcheng.service.goods.SkuService;
+import com.qingcheng.service.order.CartService;
 import com.qingcheng.service.order.OrderService;
+
+import com.qingcheng.util.IdWorker;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@Service
+
+@Service(interfaceClass = OrderService.class)
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -71,12 +85,74 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.selectByPrimaryKey(id);
     }
 
+
+    @Autowired
+    private CartService cartService;
+    @Reference
+    private SkuService skuService;
+    @Autowired
+    private IdWorker idWorker;
+    @Autowired
+    private OrderItemMapper orderItemMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     /**
      * 新增
      * @param order
      */
-    public void add(Order order) {
-        orderMapper.insert(order);
+    @Transactional
+    public Map<String,Object> add(Order order) {
+        //1.获取选中的购物车
+        List<Map<String, Object>> cartList = cartService.findNewOrderItemList(order.getUsername());
+        List<OrderItem> orderItemList = cartList.stream().filter(cart -> (boolean) cart.get("checked"))
+                .map(cart -> (OrderItem) cart.get("item"))
+                .collect(Collectors.toList());
+
+        //2.扣减库存
+        boolean flag = skuService.deductionStock(orderItemList);
+        if (!flag) {
+            throw new RuntimeException("库存扣除失败");
+        }
+
+        try {
+            //3.保存订单主表
+            order.setId(idWorker.nextId()+"");
+            int sum = orderItemList.stream().mapToInt(OrderItem::getNum).sum();
+            int money = orderItemList.stream().mapToInt(OrderItem::getMoney).sum();
+            int preferential = cartService.preferential(order.getUsername());
+            order.setTotalNum(sum);
+            order.setTotalMoney(money);
+            order.setPreMoney(preferential);
+            order.setPayMoney(money-preferential);
+            order.setCreateTime(new Date());
+            order.setOrderStatus("0");//订单状态
+            order.setPayStatus("0");//支付状态
+            order.setConsignStatus("0");//发货状态
+
+            orderMapper.insert(order);
+
+            //打折比例
+            int proportion = order.getPayMoney() / money;
+
+            //4.保存订单明细表
+            for (OrderItem orderItem : orderItemList) {
+                orderItem.setId(idWorker.nextId()+"");
+                orderItem.setOrderId(order.getId());
+                orderItem.setPayMoney(orderItem.getMoney()*proportion);
+                orderItemMapper.insert(orderItem);
+            }
+//            int x=1/0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            rabbitTemplate.convertAndSend("","queue.skuback", JSON.toJSONString(orderItemList));
+            throw new RuntimeException("创建订单失败");
+        }
+        //5.清除购物车
+        cartService.deleteCheckedCart(order.getUsername());
+        Map map = new HashMap();
+        map.put("ordersn", order.getId());
+        map.put("money", order.getPayMoney());
+        return map;
     }
 
     /**

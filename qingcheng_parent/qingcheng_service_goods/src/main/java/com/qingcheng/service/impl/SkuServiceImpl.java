@@ -5,16 +5,19 @@ import com.github.pagehelper.PageHelper;
 import com.qingcheng.dao.SkuMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.goods.Sku;
+import com.qingcheng.pojo.order.OrderItem;
 import com.qingcheng.service.goods.SkuService;
+import com.qingcheng.service.goods.SpecService;
 import com.qingcheng.util.CacheKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service(interfaceClass =SkuService.class)
 public class SkuServiceImpl implements SkuService {
 
     @Autowired
@@ -125,6 +128,36 @@ public class SkuServiceImpl implements SkuService {
 
     public void deletePriceFromRedisById(String id) {
         redisTemplate.boundHashOps(CacheKey.SKU_PRICE).delete(id);
+    }
+
+    @Transactional
+    public boolean deductionStock(List<OrderItem> orderItemList) {
+        boolean isDeduction=true;
+        for (OrderItem item : orderItemList) {
+            Sku sku = findById(item.getSkuId());
+            if (sku == null) {
+                isDeduction=false;
+                break;
+            }
+            if (!"1".equals(sku.getStatus())) {
+                isDeduction=false;
+                break;
+            }
+            if (sku.getNum().intValue() < item.getNum().intValue()) {
+                isDeduction=false;
+                break;
+            }
+        }
+        if (isDeduction) {
+            for (OrderItem orderItem : orderItemList) {
+                Sku sku = findById(orderItem.getSkuId());
+                if (sku.getNum().intValue() >=orderItem.getNum().intValue()) {
+                    skuMapper.deductionStock(orderItem.getSkuId(),orderItem.getNum());
+                    skuMapper.addSaleNum(orderItem.getSkuId(), orderItem.getNum());
+                }
+            }
+        }
+        return isDeduction;
     }
 
     /**
