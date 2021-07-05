@@ -140,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
                 orderItem.setOrderId(order.getId());
                 orderItem.setPayMoney(orderItem.getMoney()*proportion);
                 orderItemMapper.insert(orderItem);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
