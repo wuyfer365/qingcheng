@@ -13,12 +13,14 @@
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_business/qingcheng_service_business.iml" filepath="$PROJECT_DIR$/qingcheng_service_business/qingcheng_service_business.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_goods/qingcheng_service_goods.iml" filepath="$PROJECT_DIR$/qingcheng_service_goods/qingcheng_service_goods.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_order/qingcheng_service_order.iml" filepath="$PROJECT_DIR$/qingcheng_service_order/qingcheng_service_order.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qingcheng_service_seckill/qingcheng_service_seckill.iml" filepath="$PROJECT_DIR$/qingcheng_service_seckill/qingcheng_service_seckill.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_sms/qingcheng_service_sms.iml" filepath="$PROJECT_DIR$/qingcheng_service_sms/qingcheng_service_sms.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_system/qingcheng_service_system.iml" filepath="$PROJECT_DIR$/qingcheng_service_system/qingcheng_service_system.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_service_user/qingcheng_service_user.iml" filepath="$PROJECT_DIR$/qingcheng_service_user/qingcheng_service_user.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_web_center/qingcheng_web_center.iml" filepath="$PROJECT_DIR$/qingcheng_web_center/qingcheng_web_center.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_web_manager/qingcheng_web_manager.iml" filepath="$PROJECT_DIR$/qingcheng_web_manager/qingcheng_web_manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/qingcheng_web_portal/qingcheng_web_portal.iml" filepath="$PROJECT_DIR$/qingcheng_web_portal/qingcheng_web_portal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qingcheng_web_seckill/qingcheng_web_seckill.iml" filepath="$PROJECT_DIR$/qingcheng_web_seckill/qingcheng_web_seckill.iml" />
     </modules>
   </component>
 </project>

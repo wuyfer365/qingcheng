@@ -16,12 +16,14 @@
         <module name="qingcheng_service_business" />
         <module name="qingcheng_service_goods" />
         <module name="qingcheng_service_order" />
+        <module name="qingcheng_service_seckill" />
         <module name="qingcheng_service_sms" />
         <module name="qingcheng_service_system" />
         <module name="qingcheng_service_user" />
         <module name="qingcheng_web_center" />
         <module name="qingcheng_web_manager" />
         <module name="qingcheng_web_portal" />
+        <module name="qingcheng_web_seckill" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
@@ -36,12 +38,14 @@
       <module name="qingcheng_service_business" target="1.5" />
       <module name="qingcheng_service_goods" target="1.5" />
       <module name="qingcheng_service_order" target="1.8" />
+      <module name="qingcheng_service_seckill" target="1.8" />
       <module name="qingcheng_service_sms" target="1.5" />
       <module name="qingcheng_service_system" target="1.5" />
       <module name="qingcheng_service_user" target="1.5" />
       <module name="qingcheng_web_center" target="1.8" />
       <module name="qingcheng_web_manager" target="1.8" />
       <module name="qingcheng_web_portal" target="1.8" />
+      <module name="qingcheng_web_seckill" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
