@@ -1,9 +1,8 @@
 package com.qingcheng.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.qingcheng.pojo.skill.SeckillGoods;
+import com.qingcheng.pojo.seckill.SeckillGoods;
 import com.qingcheng.service.seckill.SeckillGoodsService;
-import com.qingcheng.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 

@@ -2,7 +2,7 @@ package com.qingcheng.controller;
 
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.qingcheng.pojo.skill.SeckillGoods;
+import com.qingcheng.pojo.seckill.SeckillGoods;
 import com.qingcheng.service.seckill.SeckillGoodsService;
 import com.qingcheng.util.DateUtil;
 import org.springframework.web.bind.annotation.GetMapping;

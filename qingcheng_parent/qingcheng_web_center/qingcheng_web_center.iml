@@ -35,9 +35,12 @@
     <orderEntry type="library" name="Maven: javax.persistence:persistence-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.pagehelper:pagehelper:4.1.4" level="project" />
     <orderEntry type="library" name="Maven: com.github.jsqlparser:jsqlparser:0.9.5" level="project" />
-    <orderEntry type="module" module-name="qingcheng_common_cas" />
-    <orderEntry type="module" module-name="qingcheng_common_web" />
     <orderEntry type="module" module-name="qingcheng_common" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.0.5.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.0.5.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.0.5.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.0.5.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.0.5.RELEASE" level="project" />
@@ -51,6 +54,7 @@
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.20.0-GA" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.netty:netty:3.2.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.apache.zookeeper:zookeeper:3.4.7" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-log4j12:1.6.1" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
     <orderEntry type="library" name="Maven: jline:jline:0.9.94" level="project" />
@@ -61,11 +65,11 @@
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.47" level="project" />
     <orderEntry type="library" name="Maven: javassist:javassist:3.12.1.GA" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
+    <orderEntry type="module" module-name="qingcheng_common_cas" />
+    <orderEntry type="module" module-name="qingcheng_common_web" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.3.1" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.0.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.0.6.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.0.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-taglibs:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-acl:5.0.5.RELEASE" level="project" />
@@ -81,13 +85,9 @@
     <orderEntry type="library" name="Maven: net.sf.ezmorph:ezmorph:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-cas:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.jasig.cas.client:cas-client-core:3.5.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.0.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.0.5.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:5.0.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.0.6.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.4" level="project" />

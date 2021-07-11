@@ -1,6 +1,6 @@
 package com.qingcheng.service.seckill;
 
-import com.qingcheng.pojo.skill.SeckillGoods;
+import com.qingcheng.pojo.seckill.SeckillGoods;
 
 import java.util.List;
 

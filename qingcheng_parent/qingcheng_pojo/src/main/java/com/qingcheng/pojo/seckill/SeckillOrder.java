@@ -1,4 +1,4 @@
-package com.qingcheng.pojo.skill;
+package com.qingcheng.pojo.seckill;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
