@@ -20,13 +20,11 @@ import java.util.Map;
 @RequestMapping("/wxpay")
 public class WxPayController {
 
-
     @Reference
     private OrderService orderService;
 
     @Reference
     private WeixinPayService wxPayService;
-
 
     @GetMapping("/createNative")
     public Map createNative(String orderId  ){
@@ -37,18 +35,13 @@ public class WxPayController {
         if(order!=null){
 
             if("0".equals(order.getPayStatus())  && "0".equals(order.getOrderStatus()) &&  username.equals(order.getUsername()) ){
-                return  wxPayService.createNative(orderId,order.getPayMoney(),"http://qingcheng.easy.echosite.cn/wxpay/notify.do");
-
+                return  wxPayService.createNative(orderId,order.getPayMoney(),"http://4l109b8921.wicp.vip/wxpay/notify.do");
             }else{
                 return null;
             }
-
         }else{
-
             return null;
         }
-
-
     }
 
     /**
@@ -57,24 +50,24 @@ public class WxPayController {
     @RequestMapping("/notify")
     public void notifyLogic(HttpServletRequest request){
         System.out.println("支付成功回调。。。。");
-        try {
-            InputStream inputStream = (InputStream)request.getInputStream();
-            ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
-
-            byte[] buffer=new byte[1024];
-            int len=0;
-            while( ( len= inputStream.read(buffer) )!=-1   ){
-                outputStream.write( buffer,0,len );
-            }
-            outputStream.close();
-            inputStream.close();
-            String result=new String( outputStream.toByteArray(),"utf-8" );
-            System.out.println(result);
-//            wxPayService.notifyLogic(result);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            InputStream inputStream = (InputStream)request.getInputStream();
+//            ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+//
+//            byte[] buffer=new byte[1024];
+//            int len=0;
+//            while( ( len= inputStream.read(buffer) )!=-1   ){
+//                outputStream.write( buffer,0,len );
+//            }
+//            outputStream.close();
+//            inputStream.close();
+//            String result=new String( outputStream.toByteArray(),"utf-8" );
+//            System.out.println(result);
+////            wxPayService.notifyLogic(result);
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @GetMapping("/queryPayStatus")
