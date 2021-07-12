@@ -92,36 +92,36 @@ public class WxPayServiceImpl implements WeixinPayService {
     private RabbitTemplate rabbitTemplate;
 
 
-//    @Override
-//    public void notifyLogic(String xml) {
-//
-//        try {
-//            //1.对xml进行解析 map
-//            Map<String, String> map = WXPayUtil.xmlToMap(xml);
-//            //2.验证签名
-//            boolean signatureValid = WXPayUtil.isSignatureValid(map, config.getKey());
-//
-//            System.out.println("验证签名是否正确："+signatureValid);
-//            System.out.println(map.get("out_trade_no"));
-//            System.out.println(map.get("result_code"));
-//
-//            //3.修改订单状态
-//            if(signatureValid){
-//                if("SUCCESS".equals(map.get("result_code"))){
-//                    orderService.updatePayStatus( map.get("out_trade_no"),map.get("transaction_id") );
-//                    //发送消息给mq
-//                    rabbitTemplate.convertAndSend("paynotify","",map.get("out_trade_no"));
-//                }else{
-//                    //记录日志
-//                }
-//            }else{
-//                //记录日志
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Override
+    public void notifyLogic(String xml) {
+
+        try {
+            //1.对xml进行解析 map
+            Map<String, String> map = WXPayUtil.xmlToMap(xml);
+            //2.验证签名
+            boolean signatureValid = WXPayUtil.isSignatureValid(map, config.getKey());
+
+            System.out.println("验证签名是否正确："+signatureValid);
+            System.out.println(map.get("out_trade_no"));
+            System.out.println(map.get("result_code"));
+
+            //3.修改订单状态
+            if(signatureValid){
+                if("SUCCESS".equals(map.get("result_code"))){
+                    orderService.updatePayStatus( map.get("out_trade_no"),map.get("transaction_id") );
+                    //发送消息给mq
+                    rabbitTemplate.convertAndSend("paynotify","",map.get("out_trade_no"));
+                }else{
+                    //记录日志
+                }
+            }else{
+                //记录日志
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public Map queryPayStatus(String orderId) {

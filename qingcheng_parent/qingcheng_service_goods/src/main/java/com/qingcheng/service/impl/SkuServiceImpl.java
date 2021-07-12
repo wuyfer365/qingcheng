@@ -7,7 +7,6 @@ import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.goods.Sku;
 import com.qingcheng.pojo.order.OrderItem;
 import com.qingcheng.service.goods.SkuService;
-import com.qingcheng.service.goods.SpecService;
 import com.qingcheng.util.CacheKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -159,7 +158,29 @@ public class SkuServiceImpl implements SkuService {
         }
         return isDeduction;
     }
-
+    @Transactional
+    public boolean backStock(List<OrderItem> orderItemList) {
+        boolean isDeduction=true;
+        for (OrderItem item : orderItemList) {
+            Sku sku = findById(item.getSkuId());
+            if (sku == null) {
+                isDeduction=false;
+                break;
+            }
+            if (!"1".equals(sku.getStatus())) {
+                isDeduction=false;
+                break;
+            }
+        }
+        if (isDeduction) {
+            for (OrderItem orderItem : orderItemList) {
+                Sku sku = findById(orderItem.getSkuId());
+                skuMapper.deductionStock(orderItem.getSkuId(),-orderItem.getNum());
+                skuMapper.addSaleNum(orderItem.getSkuId(), -orderItem.getNum());
+            }
+        }
+        return isDeduction;
+    }
     /**
      * 构建查询条件
      * @param searchMap

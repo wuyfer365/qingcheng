@@ -5,15 +5,21 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.qingcheng.dao.OrderItemMapper;
+import com.qingcheng.dao.OrderLogMapper;
 import com.qingcheng.dao.OrderMapper;
 import com.qingcheng.entity.PageResult;
 import com.qingcheng.pojo.order.Order;
 import com.qingcheng.pojo.order.OrderItem;
+import com.qingcheng.pojo.order.OrderLog;
 import com.qingcheng.service.goods.SkuService;
 import com.qingcheng.service.order.CartService;
 import com.qingcheng.service.order.OrderService;
 
 import com.qingcheng.util.IdWorker;
+import com.qingcheng.util.SeckillStatus;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +102,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemMapper orderItemMapper;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private OrderLogMapper orderLogMapper;
     /**
      * 新增
      * @param order
@@ -142,6 +150,8 @@ public class OrderServiceImpl implements OrderService {
                 orderItemMapper.insert(orderItem);
 
             }
+            //发送延时队列1分钟
+            sendDelayMessage(order.getId());
         } catch (Exception e) {
             e.printStackTrace();
             rabbitTemplate.convertAndSend("","queue.skuback", JSON.toJSONString(orderItemList));
@@ -154,7 +164,20 @@ public class OrderServiceImpl implements OrderService {
         map.put("money", order.getPayMoney());
         return map;
     }
-
+    public void sendDelayMessage(String orderId){
+        rabbitTemplate.convertAndSend(
+                "exchange.delay.order.begin",
+                "delay",
+                orderId,       //发送数据
+                new MessagePostProcessor() {
+                    @Override
+                    public Message postProcessMessage(Message message) throws AmqpException {
+                        //消息有效期30分钟
+                        message.getMessageProperties().setExpiration(String.valueOf(60000));
+                        return message;
+                    }
+                });
+    }
     /**
      * 修改
      * @param order
@@ -169,6 +192,32 @@ public class OrderServiceImpl implements OrderService {
      */
     public void delete(String id) {
         orderMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public void updatePayStatus(String orderId, String transactionId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+
+        if (order != null && "0".equals(order.getPayStatus())) {
+            //修改订单状态
+            order.setPayStatus("1");//支付状态
+            order.setOrderStatus("1");//订单状态
+            order.setUpdateTime(new Date());
+            order.setPayTime(new Date());
+            order.setTransactionId(transactionId);//交易流水号
+            orderMapper.updateByPrimaryKeySelective(order);
+            //记录订单日志
+            OrderLog orderLog=new OrderLog();
+            orderLog.setId(idWorker.nextId() + "");
+            orderLog.setOperater("system");
+            orderLog.setOperateTime(new Date());
+            orderLog.setPayStatus("1");
+            orderLog.setOrderStatus("1");
+            orderLog.setRemarks("支付流水号："+transactionId);
+            orderLog.setOrderId(orderId);
+            orderLogMapper.insertSelective(orderLog);
+        }
+
     }
 
     /**

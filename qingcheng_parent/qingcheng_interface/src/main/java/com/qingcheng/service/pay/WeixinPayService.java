@@ -30,5 +30,11 @@ public interface WeixinPayService {
      */
     public Map queryPayStatus(String orderId);
 
+    /**
+     * 微信支付回调
+     * @param xml
+     */
+    public void notifyLogic(String xml);
+
 
 }

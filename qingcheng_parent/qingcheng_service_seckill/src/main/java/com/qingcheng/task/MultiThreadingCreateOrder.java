@@ -109,7 +109,7 @@ public class MultiThreadingCreateOrder {
                     @Override
                     public Message postProcessMessage(Message message) throws AmqpException {
                         //消息有效期30分钟
-                        message.getMessageProperties().setExpiration(String.valueOf(10000));
+                        message.getMessageProperties().setExpiration(String.valueOf(60000));
                         return message;
                     }
                 });

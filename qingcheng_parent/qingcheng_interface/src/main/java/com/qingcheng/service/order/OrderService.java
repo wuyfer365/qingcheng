@@ -32,4 +32,10 @@ public interface OrderService {
 
     public void delete(String id);
 
+    /**
+     * 修改订单状态
+     * @param orderId
+     * @param transactionId
+     */
+    public void updatePayStatus(String orderId, String transactionId);
 }

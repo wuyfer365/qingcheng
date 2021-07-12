@@ -22,7 +22,7 @@ http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
     <rabbit:queue name="queue.delay.order.begin" durable="false">
         <rabbit:queue-arguments>
             <!-- 队列过期时间 -->
-            <entry key="x-message-ttl" value="60000" value-type="java.lang.Long"/>
+            <entry key="x-message-ttl" value="10000" value-type="java.lang.Long"/>
             <entry key="x-dead-letter-exchange" value="exchange.delay.order.done"/>
             <entry key="x-dead-letter-routing-key" value="delay"/>
         </rabbit:queue-arguments>
@@ -45,5 +45,5 @@ http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
     </rabbit:listener-container>
 
     <!--创建一个消息监听对象-->
-    <bean class="com.qingcheng.consumer.OrderMessageListener" id="orderMessageListener"></bean>
+    <bean class="com.qingcheng.service.impl.NormalOrderMessageListener" id="orderMessageListener"></bean>
 </beans>
